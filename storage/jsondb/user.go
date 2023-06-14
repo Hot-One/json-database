@@ -1,10 +1,10 @@
 package jsondb
 
 import (
-	"log"
-	"errors"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/google/uuid"
@@ -26,131 +26,148 @@ func NewUserRepo(fileName string, file *os.File) *UserRepo {
 
 func (u *UserRepo) Create(req *models.CreateUser) (*models.User, error) {
 
-	var users []*models.User
-	err := json.NewDecoder(u.file).Decode(&users)
+	users, err := u.read()
 	if err != nil {
 		return nil, err
 	}
 
-	id := uuid.New()
-	var user = &models.User{
-		Id:        id.String(),
+	var (
+		id   = uuid.New().String()
+		user = models.User{
+			Id:        id,
+			FirstName: req.FirstName,
+			LastName:  req.LastName,
+		}
+	)
+	users[id] = user
+
+	err = u.write(users)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (u *UserRepo) GetById(req *models.UserPrimaryKey) (*models.User, error) {
+
+	users, err := u.read()
+	if err != nil {
+		return nil, err
+	}
+
+	if _, ok := users[req.Id]; !ok {
+		return nil, errors.New("user not found")
+	}
+	user := users[req.Id]
+
+	return &user, nil
+}
+
+func (u *UserRepo) GetList(req *models.UserGetListRequest) (*models.UserGetListResponse, error) {
+
+	var resp = &models.UserGetListResponse{}
+	resp.Users = []*models.User{}
+
+	userMap, err := u.read()
+	if err != nil {
+		return nil, err
+	}
+
+	resp.Count = len(userMap)
+	for _, val := range userMap {
+		users := val
+		resp.Users = append(resp.Users, &users)
+	}
+
+	return resp, nil
+}
+
+func (u *UserRepo) Update(req *models.UpdateUser) (*models.User, error) {
+
+	users, err := u.read()
+	if err != nil {
+		return nil, err
+	}
+
+	if _, ok := users[req.Id]; !ok {
+		return nil, errors.New("user not found")
+	}
+
+	users[req.Id] = models.User{
+		Id:        req.Id,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 	}
 
-	users = append(users, user)
-
-	body, err := json.MarshalIndent(users, "", "	")
+	err = u.write(users)
 	if err != nil {
 		return nil, err
 	}
+	user := users[req.Id]
 
-	err = ioutil.WriteFile(u.fileName, body, os.ModePerm)
+	return &user, nil
+}
+
+func (u *UserRepo) Delete(req *models.UserPrimaryKey) error {
+
+	users, err := u.read()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return user, nil
+	delete(users, req.Id)
+
+	err = u.write(users)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (u *UserRepo) GetById(id string) (*models.User, error){
-	var users []*models.User
-	data, err := ioutil.ReadFile(u.fileName)
-	if err != nil{
-		log.Printf("Error while Read data: %+v", err)
-		return nil, nil
-	}
-	err1 := json.Unmarshal(data, &users)
-	if err1 != nil{
-		log.Printf("Error while Unmarshal data: %+v", err1)
-		return nil, nil
-	}
-	for _, user := range users{
-		if user.Id == id{
-			return user, nil
-		}
-	}
-	
-	return nil, errors.New("In database doest exist user with this id")
-}
-
-func (u *UserRepo) GetList() []*models.User{
+func (u *UserRepo) read() (map[string]models.User, error) {
 	var (
-		users []*models.User
+		users   []*models.User
+		userMap = make(map[string]models.User)
 	)
+
 	data, err := ioutil.ReadFile(u.fileName)
-	if err != nil{
+	if err != nil {
 		log.Printf("Error while Read data: %+v", err)
-		return nil
+		return nil, err
 	}
-	err1 := json.Unmarshal(data, &users)
-	if err1 != nil{
-		log.Printf("Error while Unmarshal data: %+v", err1)
-		return nil
+
+	err = json.Unmarshal(data, &users)
+	if err != nil {
+		log.Printf("Error while Unmarshal data: %+v", err)
+		return nil, err
 	}
-	return users
+
+	for _, user := range users {
+		userMap[user.Id] = *user
+	}
+
+	return userMap, nil
 }
 
-func (u *UserRepo) Update(req *models.User) (*models.User, error){
-	var users []*models.User
-	data, err := ioutil.ReadFile(u.fileName)
-	if err != nil{
-		log.Printf("Error while Read data: %+v", err)
-		return nil, nil
+func (u *UserRepo) write(userMap map[string]models.User) error {
+
+	var users []models.User
+
+	for _, val := range userMap {
+		users = append(users, val)
 	}
-	err1 := json.Unmarshal(data, &users)
-	if err1 != nil{
-		log.Printf("Error while Unmarshal data: %+v", err1)
-		return nil, nil
-	}
-	var updatedUser *models.User
-	for _, user := range users{
-		if user.Id == req.Id{
-			user.FirstName = req.FirstName
-			user.LastName = req.LastName
-			updatedUser = user
-		}
-	}
+
 	body, err := json.MarshalIndent(users, "", "	")
-
-	err = ioutil.WriteFile(u.fileName, body, os.ModePerm)
 	if err != nil {
-		return nil, err
-	}
-
-	return updatedUser, nil
-}
-
-func (u *UserRepo) Delete(id string) (*models.User, error){
-	var users []*models.User
-	var newusers []*models.User
-	data, err := ioutil.ReadFile(u.fileName)
-	if err != nil{
-		log.Printf("Error while Read data: %+v", err)
-		return nil, nil
-	}
-	err1 := json.Unmarshal(data, &users)
-	if err1 != nil{
-		log.Printf("Error while Unmarshal data: %+v", err1)
-		return nil, nil
-	}
-	for _, user := range users{
-		if user.Id != id{
-			newusers = append(newusers, user)
-		}
-	}
-
-	body, err := json.MarshalIndent(newusers, "", "	")
-	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = ioutil.WriteFile(u.fileName, body, os.ModePerm)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return nil, nil
+	return nil
 }
-

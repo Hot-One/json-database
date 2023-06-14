@@ -4,8 +4,11 @@ type Config struct {
 	DefaultOffset int
 	DefaultLimit  int
 
-	Path         string
+	UserPath         string
 	UserFileName string
+
+	ProductPath string
+	ProductFileName string
 }
 
 func Load() Config {
@@ -15,8 +18,11 @@ func Load() Config {
 	cfg.DefaultOffset = 0
 	cfg.DefaultLimit = 10
 
-	cfg.Path = "./data"
+	cfg.UserPath = "./data"
 	cfg.UserFileName = "/user.json"
+
+	cfg.ProductPath = "./data"
+	cfg.ProductFileName = "/product.json"
 
 	return cfg
 }
