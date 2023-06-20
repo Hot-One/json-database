@@ -7,7 +7,7 @@ import (
 	"app/models"
 )
 
-func (c *Controller) UserCreate(req *models.CreateUser) (*models.User, error) {
+func (c *Controller) UserCreate(req *models.UserCreate) (*models.User, error) {
 
 	log.Printf("User create req: %+v\n", req)
 
@@ -20,7 +20,7 @@ func (c *Controller) UserCreate(req *models.CreateUser) (*models.User, error) {
 	return resp, nil
 }
 
-func (c *Controller) GetById(req *models.UserPrimaryKey) (*models.User, error) {
+func (c *Controller) UserGetById(req *models.UserPrimaryKey) (*models.User, error) {
 
 	resp, err := c.Strg.User().GetById(req)
 	if err != nil {
@@ -42,7 +42,7 @@ func (c *Controller) UserGetList(req *models.UserGetListRequest) (*models.UserGe
 	return resp, nil
 }
 
-func (c *Controller) UserUpdate(req *models.UpdateUser) (*models.User, error) {
+func (c *Controller) UserUpdate(req *models.UserUpdate) (*models.User, error) {
 
 	resp, err := c.Strg.User().Update(req)
 	if err != nil {

@@ -7,24 +7,24 @@ import (
 	"app/models"
 )
 
-func (c *Controller) ProductCreate(req *models.CreateProduct) (*models.Product, error) {
+func (c *Controller) ProductCreate(req *models.ProductCreate) (*models.Product, error) {
 
-	log.Printf("Product create req: %+v\n", req)
+	log.Printf("User create req: %+v\n", req)
 
 	resp, err := c.Strg.Product().Create(req)
 	if err != nil {
-		log.Printf("error while product Create: %+v\n", err)
+		log.Printf("error while user Create: %+v\n", err)
 		return nil, errors.New("invalid data")
 	}
 
 	return resp, nil
 }
 
-func (c *Controller) ProductGetById(req *models.ProductPrimaryKey) (*models.Product, error) {
+func (c *Controller) PoductGetById(req *models.ProductPrimaryKey) (*models.Product, error) {
 
 	resp, err := c.Strg.Product().GetById(req)
 	if err != nil {
-		log.Printf("error while product GetById: %+v\n", err)
+		log.Printf("error while user GetById: %+v\n", err)
 		return nil, err
 	}
 
@@ -42,7 +42,7 @@ func (c *Controller) ProductGetList(req *models.ProductGetListRequest) (*models.
 	return resp, nil
 }
 
-func (c *Controller) ProductUpdate(req *models.UpdateProduct) (*models.Product, error) {
+func (c *Controller) ProductUpdate(req *models.ProductUpdate) (*models.Product, error) {
 
 	resp, err := c.Strg.Product().Update(req)
 	if err != nil {

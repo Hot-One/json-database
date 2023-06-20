@@ -24,7 +24,7 @@ func NewUserRepo(fileName string, file *os.File) *UserRepo {
 	}
 }
 
-func (u *UserRepo) Create(req *models.CreateUser) (*models.User, error) {
+func (u *UserRepo) Create(req *models.UserCreate) (*models.User, error) {
 
 	users, err := u.read()
 	if err != nil {
@@ -37,6 +37,7 @@ func (u *UserRepo) Create(req *models.CreateUser) (*models.User, error) {
 			Id:        id,
 			FirstName: req.FirstName,
 			LastName:  req.LastName,
+			Balance:   req.Balance,
 		}
 	)
 	users[id] = user
@@ -83,7 +84,7 @@ func (u *UserRepo) GetList(req *models.UserGetListRequest) (*models.UserGetListR
 	return resp, nil
 }
 
-func (u *UserRepo) Update(req *models.UpdateUser) (*models.User, error) {
+func (u *UserRepo) Update(req *models.UserUpdate) (*models.User, error) {
 
 	users, err := u.read()
 	if err != nil {
@@ -98,6 +99,7 @@ func (u *UserRepo) Update(req *models.UpdateUser) (*models.User, error) {
 		Id:        req.Id,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
+		Balance:   req.Balance,
 	}
 
 	err = u.write(users)

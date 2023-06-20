@@ -1,7 +1,26 @@
 [
 	{
-		"id": "13526574-a20f-4a43-b9ff-9aef94bcd639",
-		"first_name": "Tursinbek",
-		"last_name": "Aytbaev"
+		"id": "c01f0fb9-2531-425f-85fb-480b8824f170",
+		"first_name": "Xumoyun",
+		"last_name": "Komilov",
+		"balance": 3000000
+	},
+	{
+		"id": "26fc445f-901e-453f-ae1b-81539e746601",
+		"first_name": "Abdulbosit",
+		"last_name": "Qobilov",
+		"balance": 1000000
+	},
+	{
+		"id": "059f9715-a13b-4eb7-b2c0-eb969782cc08",
+		"first_name": "Shoxruh",
+		"last_name": "Saipov",
+		"balance": 1720000
+	},
+	{
+		"id": "6e1e4028-7600-4733-a5e8-b124dd37d7ab",
+		"first_name": "Jovlon",
+		"last_name": "Xaydarov",
+		"balance": 1000000
 	}
 ]

@@ -24,24 +24,26 @@ func NewProductRepo(fileName string, file *os.File) *ProductRepo {
 	}
 }
 
-func (p *ProductRepo) Create(req *models.CreateProduct) (*models.Product, error) {
+func (u *ProductRepo) Create(req *models.ProductCreate) (*models.Product, error) {
 
-	products, err := p.read()
+	products, err := u.read()
 	if err != nil {
 		return nil, err
 	}
 
 	var (
-		id   = uuid.New().String()
+		id      = uuid.New().String()
 		product = models.Product{
-			Id:     id,
-			Name: 	req.Name,
-			Price:  req.Price,
+			Id:           id,
+			Name:         req.Name,
+			Price:        req.Price,
+			Discount:     req.Discount,
+			DiscountType: req.DiscountType,
+			CategoryID:   req.CategoryID,
 		}
 	)
 	products[id] = product
-
-	err = p.write(products)
+	err = u.write(products)
 	if err != nil {
 		return nil, err
 	}
@@ -49,9 +51,9 @@ func (p *ProductRepo) Create(req *models.CreateProduct) (*models.Product, error)
 	return &product, nil
 }
 
-func (p *ProductRepo) GetById(req *models.ProductPrimaryKey) (*models.Product, error) {
+func (u *ProductRepo) GetById(req *models.ProductPrimaryKey) (*models.Product, error) {
 
-	products, err := p.read()
+	products, err := u.read()
 	if err != nil {
 		return nil, err
 	}
@@ -64,28 +66,28 @@ func (p *ProductRepo) GetById(req *models.ProductPrimaryKey) (*models.Product, e
 	return &product, nil
 }
 
-func (p *ProductRepo) GetList(req *models.ProductGetListRequest) (*models.ProductGetListResponse, error) {
+func (u *ProductRepo) GetList(req *models.ProductGetListRequest) (*models.ProductGetListResponse, error) {
 
 	var resp = &models.ProductGetListResponse{}
 	resp.Products = []*models.Product{}
 
-	productMap, err := p.read()
+	productMap, err := u.read()
 	if err != nil {
 		return nil, err
 	}
 
 	resp.Count = len(productMap)
 	for _, val := range productMap {
-		Products := val
-		resp.Products = append(resp.Products, &Products)
+		users := val
+		resp.Products = append(resp.Products, &users)
 	}
 
 	return resp, nil
 }
 
-func (p *ProductRepo) Update(req *models.UpdateProduct) (*models.Product, error) {
+func (u *ProductRepo) Update(req *models.ProductUpdate) (*models.Product, error) {
 
-	products, err := p.read()
+	products, err := u.read()
 	if err != nil {
 		return nil, err
 	}
@@ -95,12 +97,15 @@ func (p *ProductRepo) Update(req *models.UpdateProduct) (*models.Product, error)
 	}
 
 	products[req.Id] = models.Product{
-		Id:        req.Id,
-		Name: req.Name,
-		Price:  req.Price,
+		Id:           req.Id,
+		Name:         req.Name,
+		Price:        req.Price,
+		Discount:     req.Discount,
+		DiscountType: req.DiscountType,
+		CategoryID:   req.CategoryID,
 	}
 
-	err = p.write(products)
+	err = u.write(products)
 	if err != nil {
 		return nil, err
 	}
@@ -109,16 +114,16 @@ func (p *ProductRepo) Update(req *models.UpdateProduct) (*models.Product, error)
 	return &product, nil
 }
 
-func (p *ProductRepo) Delete(req *models.ProductPrimaryKey) error {
+func (u *ProductRepo) Delete(req *models.ProductPrimaryKey) error {
 
-	products, err := p.read()
+	products, err := u.read()
 	if err != nil {
 		return err
 	}
 
 	delete(products, req.Id)
 
-	err = p.write(products)
+	err = u.write(products)
 	if err != nil {
 		return err
 	}
@@ -126,13 +131,13 @@ func (p *ProductRepo) Delete(req *models.ProductPrimaryKey) error {
 	return nil
 }
 
-func (p *ProductRepo) read() (map[string]models.Product, error) {
+func (u *ProductRepo) read() (map[string]models.Product, error) {
 	var (
 		products   []*models.Product
 		productMap = make(map[string]models.Product)
 	)
 
-	data, err := ioutil.ReadFile(p.fileName)
+	data, err := ioutil.ReadFile(u.fileName)
 	if err != nil {
 		log.Printf("Error while Read data: %+v", err)
 		return nil, err
@@ -151,7 +156,7 @@ func (p *ProductRepo) read() (map[string]models.Product, error) {
 	return productMap, nil
 }
 
-func (p *ProductRepo) write(productMap map[string]models.Product) error {
+func (u *ProductRepo) write(productMap map[string]models.Product) error {
 
 	var products []models.Product
 
@@ -164,7 +169,7 @@ func (p *ProductRepo) write(productMap map[string]models.Product) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(p.fileName, body, os.ModePerm)
+	err = ioutil.WriteFile(u.fileName, body, os.ModePerm)
 	if err != nil {
 		return err
 	}

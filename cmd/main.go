@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"app/config"
 	"app/controller"
@@ -18,188 +17,104 @@ func main() {
 	}
 	con := controller.NewController(&cfg, strg)
 
-	// Create Product \\
+	con.TransferCash(7200000, &models.UserPrimaryKey{
+		Id: "26fc445f-901e-453f-ae1b-81539e746601",
+	}, &models.UserPrimaryKey{
+		Id: "059f9715-a13b-4eb7-b2c0-eb969782cc08",
+	})
+	// active, err := con.ActiveUser()
+	// if err != nil {
+	// 	return err
+	// }
 
-	// product, err := con.ProductCreate(&models.CreateProduct{
-	// 	Name: "Nan",
-	// 	Price: "213141",
+	// s, err := con.HistoryUser(&models.OrderPrimaryKey{
+	// 	Id: "27f2d317-7554-4285-8484-fdcdea004664",
 	// })
-	// if err != nil {
-	// 	log.Println("product create err:", err)
-	// 	return
+	// fmt.Println(s.FirstName, s.LastName)
+	// for k, v := range s.Products {
+	// 	fmt.Println(k, v[0], v[1])
 	// }
-	// fmt.Printf("%+v\n", product)
+	// User(con)
+	// Category(con)
+	// Product(con)
+	// Order(con)
+	// OrderItem(con)
+	// OrderPayment(con)
+}
 
-	// Get By Id Product \\
+func User(con *controller.Controller) {
+	con.UserCreate(&models.UserCreate{
+		FirstName: "Xumoyun",
+		LastName:  "Komilov",
+		Balance:   3_000_000,
+	})
+}
 
-	// byid, err := con.ProductGetById(&models.ProductPrimaryKey{Id: "d87345a9-595d-47eb-bb14-378dcffc362e"})
-	// if err != nil {
-	// 	log.Printf("Error while GetById: %+v\n", err)
-	// 	return
-	// }
-	// fmt.Println(byid)
+func Category(con *controller.Controller) {
+	con.CategoryCreate(&models.CategoryCreate{
+		Name: "Ilmiy",
+	})
+}
 
-	// Get List Product
+func Product(con *controller.Controller) {
 
-	// var dataLimit int
-	// var page int
-	// var answer string
-	// fmt.Printf("Input Data limit: ")
-	// fmt.Scan(&dataLimit)
-	// for {
-	// 	fmt.Printf("Press e if you want end. Press n to continue: ")
-	// 	fmt.Scan(&answer)
-	// 	if answer == "n" {
-	// 		fmt.Println("Input page:")
-	// 		fmt.Scan(&page)
-	// 		respProduct, err := con.ProductGetList(&models.ProductGetListRequest{
-	// 			Offset: (page - 1) * dataLimit,
-	// 			Limit:  dataLimit,
-	// 		})
+	var categoryId = "209237bc-aab9-47a9-aebd-58a0dcaa63f1"
+	var products = []models.ProductCreate{
+		{
+			Name:         "Matematika",
+			Price:        15_000,
+			Discount:     0,
+			DiscountType: "",
+			CategoryID:   categoryId,
+		},
+		{
+			Name:         "Learning Golang",
+			Price:        200_000,
+			Discount:     30,
+			DiscountType: config.PercentDiscountType,
+			CategoryID:   categoryId,
+		},
+		{
+			Name:         "Clean Code",
+			Price:        350_000,
+			Discount:     40_000,
+			DiscountType: config.FixDiscountType,
+			CategoryID:   categoryId,
+		},
+	}
 
-	// 		if err != nil {
-	// 			fmt.Println(err)
-	// 			continue
-	// 		}
+	for _, product := range products {
+		con.ProductCreate(&product)
+	}
+}
 
-	// 		for _, product := range respProduct.Products {
-	// 			fmt.Println(product)
-	// 		}
-	// 	} else if answer == "e" {
-	// 		break
-	// 	}
-	// }
+func Order(con *controller.Controller) {
+	con.OrderCreate(&models.OrderCreate{
+		UserId: "c01f0fb9-2531-425f-85fb-480b8824f170",
+	})
+}
 
-	// Product Update \\
+func OrderItem(con *controller.Controller) {
+	var (
+		orderId   = "8294f2dc-88f7-4794-aa2a-3f898486f555"
+		productId = "d80ac6f0-42e5-4d82-aaf5-b9f28fa62ee3"
+		count     = 7
+	)
 
-	// product, err := con.ProductUpdate(&models.UpdateProduct{
-	// 	Id:        "d87345a9-595d-47eb-bb14-378dcffc362e",
-	// 	Name: "updatedname",
-	// 	Price:  "updatedlname",
-	// })
+	con.AddOrderItem(&models.OrderItemCreate{
+		OrderId:   orderId,
+		ProductId: productId,
+		Count:     count,
+	})
+}
 
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+func OrderPayment(con *controller.Controller) {
 
-	// fmt.Printf("%+v\n", product)
+	var orderId = "27f2d317-7554-4285-8484-fdcdea004664"
 
-	// Product Delete \\
+	err := con.OrderPayment(&models.OrderPayment{
+		OrderId: orderId,
+	})
 
-	// err = con.ProductDelete(&models.ProductPrimaryKey{Id: "d87345a9-595d-47eb-bb14-378dcffc362e"})
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-
-	// USER \\
-
-	// for {
-	// 	var (
-	// 		answer string
-	// 	)
-	// 	fmt.Printf("1.Create User\n2.Get By User Id\n3.Get User List\n4.Update User Info\n5.Delete User\n6.Exit\nEnter: ")
-	// 	fmt.Scan(&answer)
-	// 	if answer == "1" {
-	// 		var (
-	// 			name     string
-	// 			lastname string
-	// 		)
-	// 		fmt.Printf("First Name: ")
-	// 		fmt.Scan(&name)
-	// 		fmt.Printf("Last Name: ")
-	// 		fmt.Scan(&lastname)
-	// 		user, err := con.UserCreate(&models.CreateUser{
-	// 			FirstName: name,
-	// 			LastName:  lastname,
-	// 		})
-
-			// if err != nil {
-			// 	log.Println("user create err:", err)
-			// 	continue
-			// }
-
-			// fmt.Printf("%+v\n", user)
-	// 		fmt.Println("User Created successfully")
-	// 	} else if answer == "2" {
-	// 		var id string
-	// 		fmt.Printf("Enter id of user: ")
-	// 		fmt.Scan(&id)
-			// byid, err := con.GetById(&models.UserPrimaryKey{Id: id})
-			// if err != nil {
-			// 	log.Printf("Error while GetById: %+v\n", err)
-			// 	continue
-			// }
-			// fmt.Println(byid)
-	// 	} else if answer == "3" {
-			// var dataLimit int
-			// var page int
-			// var answer string
-			// fmt.Printf("Input Data limit: ")
-			// fmt.Scan(&dataLimit)
-			// for {
-			// 	fmt.Printf("Press e if you want end. Press n to continue: ")
-			// 	fmt.Scan(&answer)
-			// 	if answer == "n" {
-			// 		fmt.Println("Input page:")
-			// 		fmt.Scan(&page)
-			// 		respUser, err := con.UserGetList(&models.UserGetListRequest{
-			// 			Offset: (page - 1) * dataLimit,
-			// 			Limit:  dataLimit,
-			// 		})
-
-			// 		if err != nil {
-			// 			fmt.Println(err)
-			// 			continue
-			// 		}
-
-			// 		for _, user := range respUser.Users {
-			// 			fmt.Println(user)
-			// 		}
-			// 	} else if answer == "e" {
-			// 		break
-			// 	}
-			// }
-	// 	} else if answer == "4" {
-	// 		var (
-	// 			id           string
-	// 			updatedname  string
-	// 			updatedlname string
-	// 		)
-	// 		fmt.Printf("Enter id of user: ")
-	// 		fmt.Scan(&id)
-	// 		fmt.Printf("Enter New Name: ")
-	// 		fmt.Scan(&updatedname)
-	// 		fmt.Printf("Enter new Last Name: ")
-	// 		fmt.Scan(&updatedlname)
-			// user, err := con.UserUpdate(&models.UpdateUser{
-			// 	Id:        id,
-			// 	FirstName: updatedname,
-			// 	LastName:  updatedlname,
-			// })
-
-			// if err != nil {
-			// 	fmt.Println(err)
-			// 	continue
-			// }
-
-			// fmt.Printf("%+v\n", user)
-	// 		fmt.Println("Users information successfully updated !")
-	// 	} else if answer == "5" {
-	// 		var (
-	// 			id string
-	// 		)
-	// 		fmt.Printf("Enter id of User: ")
-	// 		fmt.Scan(&id)
-			// err = con.UserDelete(&models.UserPrimaryKey{Id: id})
-			// if err != nil {
-			// 	fmt.Println(err)
-			// 	continue
-			// }
-	// 		fmt.Println("User successfully deleted !")
-	// 	} else {
-	// 		break
-	// 	}
-	// }
+	fmt.Println(err)
 }

@@ -1,14 +1,25 @@
 package config
 
+const (
+	FixDiscountType     = "FIX"
+	PercentDiscountType = "PERCENT"
+)
+
+var OrderStatus = map[string]string{
+	"0": "in_process",
+	"1": "success",
+}
+
 type Config struct {
 	DefaultOffset int
 	DefaultLimit  int
 
-	UserPath         string
+	Path         string
 	UserFileName string
 
-	ProductPath string
-	ProductFileName string
+	ProductFileName  string
+	CategoryFileName string
+	OrderFileName    string
 }
 
 func Load() Config {
@@ -18,11 +29,12 @@ func Load() Config {
 	cfg.DefaultOffset = 0
 	cfg.DefaultLimit = 10
 
-	cfg.UserPath = "./data"
+	cfg.Path = "./data"
 	cfg.UserFileName = "/user.json"
-
-	cfg.ProductPath = "./data"
+	cfg.CategoryFileName = "/category.json"
 	cfg.ProductFileName = "/product.json"
+
+	cfg.OrderFileName = "/order.json"
 
 	return cfg
 }

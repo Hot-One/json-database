@@ -4,21 +4,30 @@ type ProductPrimaryKey struct {
 	Id string `json:"id"`
 }
 
-type CreateProduct struct {
-	Name string `json:"first_name"`
-	Price  string `json:"last_name"`
+type ProductCreate struct {
+	Name         string `json:"name"`
+	Price        int    `json:"price"`
+	Discount     int    `json:"discount"`
+	DiscountType string `json:"discount_type"`
+	CategoryID   string `json:"category_id"`
 }
 
 type Product struct {
-	Id        string `json:"id"`
-	Name string `json:"first_name"`
-	Price  string `json:"last_name"`
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	Price        int    `json:"price"`
+	Discount     int    `json:"discount"`
+	DiscountType string `json:"discount_type"`
+	CategoryID   string `json:"category_id"`
 }
 
-type UpdateProduct struct {
-	Id        string `json:"id"`
-	Name string `json:"first_name"`
-	Price  string `json:"last_name"`
+type ProductUpdate struct {
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	Price        int    `json:"price"`
+	Discount     int    `json:"discount"`
+	DiscountType string `json:"discount_type"`
+	CategoryID   string `json:"category_id"`
 }
 
 type ProductGetListRequest struct {
@@ -27,6 +36,6 @@ type ProductGetListRequest struct {
 }
 
 type ProductGetListResponse struct {
-	Count int
+	Count    int
 	Products []*Product
 }
